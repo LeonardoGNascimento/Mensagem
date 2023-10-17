@@ -1,27 +1,17 @@
-import { Col, Row, Button } from "react-bootstrap";
-import { TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Login } from "./pages/login";
+import { Chat } from "./pages/chat";
 
 export default function App() {
-  return (
-    <>
-      <div className="d-flex justify-content-center">
-        <Row>
-          <Col>
-            <TextField id="nome" label="Nome" variant="outlined" />
-          </Col>
-          <Col>
-            <TextField
-              id="outlined-basic"
-              label="Código sala"
-              variant="outlined"
-            />
-          </Col>
-        </Row>
-      </div>
-      <div className="d-flex justify-content-center">
-        <Button>Gerar Link</Button>
-        <Button>Entrar</Button>
-      </div>
-    </>
-  );
+  const [chat, setChat] = useState<string | null>();
+
+  useEffect(() => {
+    const queryString = window.location.search;
+    const searchParams = new URLSearchParams(queryString);
+    const paramValue = searchParams.get("chat");
+
+    setChat(paramValue);
+  }, []);
+
+  return chat ? <Chat chat={chat}/> : <Login />;
 }
