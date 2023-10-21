@@ -1,0 +1,37 @@
+POST http://localhost:3000/usuario/ HTTP/1.1
+content-type: application/json
+
+{
+    "nome": "Leo",
+    "email": "leo@leo",
+    "senha": "123"
+}
+
+
+###
+
+GET http://localhost:3000/usuario/ HTTP/1.1
+content-type: application/json
+
+###
+POST http://localhost:3000/usuario/login HTTP/1.1
+content-type: application/json
+
+{
+    "email": "leo@leo",
+    "senha": "123"
+}
+
+###
+
+POST http://localhost:3000/chat/ HTTP/1.1
+content-type: application/json
+
+{
+    "codigo": "asdasd"
+}
+
+###
+
+GET http://localhost:3000/chat/ HTTP/1.1
+content-type: application/json
