@@ -14,6 +14,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { DivMensagens } from "./components/styles";
 import { Mensagem } from "./components/Mensagem";
+import { ContainerChat } from "./style";
 
 interface Props {
   chat: string;
@@ -29,21 +30,16 @@ export function Chat({ chat }: Props) {
       return;
     }
 
-    socket.emit(
-      "criar_chat",
-      {
-        chat,
-        usuario: localStorage.getItem("nome"),
-      },
-      (response: any) => {
-        if (response) {
-          setMensagens((mensagensAnteriores) => [
-            ...mensagensAnteriores,
-            ...response.mensagens,
-          ]);
-        }
-      }
-    );
+    socket.on("historico", (item) => {
+      console.log(item[0].usuario.nome);
+
+      setMensagens(item);
+    });
+
+    socket.emit("criar_chat", {
+      chat,
+      usuario: localStorage.getItem("nome"),
+    });
 
     socket.on("recebido", (teste) => {
       setMensagens((mensagensAnteriores) => [...mensagensAnteriores, teste]);
@@ -51,88 +47,67 @@ export function Chat({ chat }: Props) {
   }, []);
 
   return (
-    <>
-      <Toaster position="top-right" reverseOrder={false} gutter={8} />
-      <Container>
+    <ContainerChat>
+      <Navbar
+        bg="primary"
+        data-bs-theme="dark"
+        expand="lg"
+        className="bg-body-tertiary"
+      >
+        <Container>
+          <Navbar.Brand href="#home">ZAP ZAP 2</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav"></Navbar.Collapse>
+        </Container>
+      </Navbar>
+      {/* mensagens */}
+
+      <DivMensagens>
+        {mensagens.map((item: any, index: number) => {
+          return (
+            <Mensagem
+              nome={item.usuario.nome}
+              key={index}
+              conteudo={item.mensagem}
+              data={new Date(item.dataHora).toLocaleString()}
+              usuarioLocal={true}
+            />
+          );
+        })}
+      </DivMensagens>
+
+      {/* <a href="/">Voltar</a> */}
+      <div>
         <Navbar
           bg="primary"
           data-bs-theme="dark"
           expand="lg"
           className="bg-body-tertiary"
         >
-          <Container>
-            <Navbar.Brand href="#home">ZAP ZAP 2</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav"></Navbar.Collapse>
-          </Container>
+          <InputGroup>
+            <Form.Control
+              as="textarea"
+              aria-label="With textarea"
+              placeholder="Digite uma Mensagem"
+              value={mensagemAtual}
+              onChange={(item) => setMensagemAtual(item.target.value)}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.keyCode !== 13) {
+                  return;
+                }
+
+                socket.emit("recebido", {
+                  mensagem: mensagemAtual,
+                  time: new Date().toLocaleString(),
+                  chat,
+                  usuario: localStorage.getItem("nome"),
+                });
+                setMensagemAtual("");
+              }}
+            />
+          </InputGroup>
         </Navbar>
-        {/* mensagens */}
-
-        <DivMensagens>
-          {mensagens.map((item: any, index: number) => {
-            return (
-              <Mensagem 
-                key={index}
-                conteudo={item.usuario + ":" + item.mensagem}
-                data={item.time}
-                usuarioLocal={true}
-              />
-            );
-          })}
-        </DivMensagens>
-
-        {/* <a href="/">Voltar</a> */}
-        <div>
-          <Navbar
-            bg="primary"
-            data-bs-theme="dark"
-            expand="lg"
-            className="bg-body-tertiary"
-          >
-            <Container>
-              <InputGroup>
-                <Form.Control
-                  as="textarea"
-                  aria-label="With textarea"
-                  placeholder="Digite uma Mensagem"
-                  value={mensagemAtual}
-                  onChange={(item) => setMensagemAtual(item.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key !== "Enter" && event.keyCode !== 13) {
-                      return;
-                    }
-
-                    socket.emit("recebido", {
-                      mensagem: mensagemAtual,
-                      time: new Date().toLocaleString(),
-                      chat,
-                      usuario: localStorage.getItem("nome"),
-                    });
-                    setMensagemAtual("");
-                  }}
-                />
-              </InputGroup>
-              {/* <textarea
-                        value={mensagemAtual}
-                        onChange={(item) => setMensagemAtual(item.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key !== "Enter" && event.keyCode !== 13) {
-                            return;
-                          }
-
-                          socket.emit("recebido", {
-                            mensagem: mensagemAtual,
-                            time: new Date().toLocaleString(),
-                            chat,
-                            usuario: localStorage.getItem("nome"),
-                          });
-                          setMensagemAtual("");
-                        }}
-                      /> */}
-            </Container>
-          </Navbar>
-        </div>
-      </Container>
-    </>
+      </div>
+    </ContainerChat>
   );
 }
