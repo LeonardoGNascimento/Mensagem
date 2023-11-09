@@ -8,6 +8,8 @@ import { CriarUsuarioCommand } from 'src/usuario/dominio/command/criarUsuario.co
 import { LogarCommand } from 'src/usuario/dominio/command/logar.command';
 import { ListarUsuarioQuery } from 'src/usuario/dominio/query/listarUsuario.query';
 import { UsuarioRepository } from 'src/usuario/infra/repository/usuario.repository';
+import * as bcrypt from 'bcrypt';
+import { log } from 'console';
 
 @Injectable()
 export class UsuarioService {
@@ -23,6 +25,10 @@ export class UsuarioService {
       throw new BadRequestException('E-mail ou senha incorreto');
     }
 
+    if (!(await bcrypt.compare(logarCommand.senha, usuario.senha))) {
+      throw new BadRequestException('E-mail ou senha incorreto');
+    }
+
     return {
       access_token: this.jwtService.sign({
         id: usuario.id,
@@ -32,6 +38,8 @@ export class UsuarioService {
   }
 
   async criar(criarUsuarioCommand: CriarUsuarioCommand) {
+    console.log(criarUsuarioCommand);
+
     const emailExiste = await this.usuarioRepository.buscarPorEmail(
       criarUsuarioCommand.email,
     );

@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MensagemService } from './aplicacao/service/mensagem.service';
 import { MensagemRepository } from './infra/repository/mensagem.repository';
-import { PrismaService } from 'src/core/prisma/prisma.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Mensagem } from './dominio/entity/mensagem.entity';
 
 @Module({
-  providers: [MensagemService, MensagemRepository, PrismaService],
+  imports: [TypeOrmModule.forFeature([Mensagem])],
+  providers: [MensagemService, MensagemRepository],
   exports: [MensagemService, MensagemRepository],
 })
 export class MensagemModule {}

@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ChatService } from './aplicacao/service/chat.service';
-import { PrismaService } from 'src/core/prisma/prisma.service';
 import { ChatRepository } from './infra/repository/chat.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Chat } from 'src/mensagem/dominio/entity/chat.entity';
 
 @Module({
-  providers: [ChatService, PrismaService, ChatRepository],
-  exports: [ChatService, PrismaService, ChatRepository],
+  imports: [TypeOrmModule.forFeature([Chat])],
+  providers: [ChatService, ChatRepository],
+  exports: [ChatService, ChatRepository],
 })
 export class ChatModule {}

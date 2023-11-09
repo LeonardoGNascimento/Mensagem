@@ -4,7 +4,7 @@ content-type: application/json
 {
     "nome": "Leo",
     "email": "leo@leo",
-    "senha": "123"
+    "senha": "leo"
 }
 
 
@@ -19,7 +19,7 @@ content-type: application/json
 
 {
     "email": "leo@leo",
-    "senha": "123"
+    "senha": "leo"
 }
 
 ###

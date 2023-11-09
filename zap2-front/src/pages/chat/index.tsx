@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
+import { Container, Form, InputGroup, Navbar } from "react-bootstrap";
 import socket from "../../config/socket";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Nav,
-  NavDropdown,
-  Navbar,
-  Row,
-} from "react-bootstrap";
-import toast, { Toaster } from "react-hot-toast";
-import { DivMensagens } from "./components/styles";
 import { Mensagem } from "./components/Mensagem";
+import { DivMensagens } from "./components/styles";
 import { ContainerChat } from "./style";
 
 interface Props {
@@ -31,8 +20,6 @@ export function Chat({ chat }: Props) {
     }
 
     socket.on("historico", (item) => {
-      console.log(item[0].usuario.nome);
-
       setMensagens(item);
     });
 
@@ -98,7 +85,7 @@ export function Chat({ chat }: Props) {
 
                 socket.emit("recebido", {
                   mensagem: mensagemAtual,
-                  time: new Date().toLocaleString(),
+                  dataHora: new Date(),
                   chat,
                   usuario: localStorage.getItem("nome"),
                 });

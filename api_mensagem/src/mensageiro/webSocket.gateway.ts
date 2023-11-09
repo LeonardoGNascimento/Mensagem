@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,10 +6,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { log } from 'console';
 import { Server } from 'socket.io';
 import { ChatService } from 'src/chat/aplicacao/service/chat.service';
 import { WsAuthGuard } from 'src/core/jwt/ws.guard';
 import { MensagemService } from 'src/mensagem/aplicacao/service/mensagem.service';
+import { setTimeout } from 'node:timers/promises';
+import { Ws2AuthGuard } from 'src/core/jwt/ws2.guard';
 
 @WebSocketGateway({ cors: true })
 export class WebsocketsGateway {
@@ -20,7 +23,7 @@ export class WebsocketsGateway {
     private mensagemService: MensagemService,
   ) {}
 
-  @UseGuards(WsAuthGuard)
+  @UseGuards(Ws2AuthGuard)
   @SubscribeMessage('criar_chat')
   async handleCriarChat(
     @ConnectedSocket() client: any,
@@ -34,17 +37,22 @@ export class WebsocketsGateway {
       });
     }
 
+    const mensagens = chatExiste
+      ? await this.mensagemService.buscarPorChat(chatExiste.id)
+      : [];
+
     client.join(chat.chat);
-    client.emit('historico', chatExiste ? chatExiste.Mensagem : []);
+
+    client.emit('historico', mensagens);
   }
 
-  @UseGuards(WsAuthGuard)
+  @UseGuards(Ws2AuthGuard)
   @SubscribeMessage('recebido')
   async handleRecebido(
     @ConnectedSocket() client: any,
     @MessageBody() chat: any,
   ) {
-    const user = client.handshake.user;
+    const user = client.handshake.headers.user;
     const chatExiste = await this.chatService.buscarPorCodigo(chat.chat);
 
     this.mensagemService.cadastrar({
@@ -53,6 +61,8 @@ export class WebsocketsGateway {
       usuarioId: user.id,
     });
 
-    this.server.to(chat.chat).emit('recebido', chat);
+    this.server
+      .to(chat.chat)
+      .emit('recebido', { ...chat, usuario: { nome: user.nome } });
   }
 }

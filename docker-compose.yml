@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  api:
+    build: 
+      context: ./api_mensagem
+      dockerfile: Dockerfile
+    volumes:
+      - ./api_mensagem:/app/api
+    ports:
+      - 3000:3000
+  db:
+    container_name: mensagem-db
+    image: mariadb
+    restart: always
+    volumes: 
+      - ./Maria_Data:/var/lib/mysql/
+    command: --default-authentication-plugin=mysql_native_password
+    ports: 
+      - "4433:3306"
+    environment: 
+      MARIADB_ROOT_PASSWORD: "mensagem"
+      MARIADB_DATABASE: "mensagem"
+    tty: true
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 6969:8080
+  redis:
+    container_name: redis
+    image: redis:7.0-alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis:/data
+networks:
+  default:
