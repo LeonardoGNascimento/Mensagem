@@ -1,12 +1,18 @@
 pipeline{
     agent any
 
-    stages{
+   stages {
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                sh 'echo 123'
+                sh 'docker build -t mensagens .'
             }
         }
-    }
+   }
 
 }
