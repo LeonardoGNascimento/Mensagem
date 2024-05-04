@@ -2,9 +2,9 @@ pipeline{
     agent any
 
    stages {
-        stage('Build Docker Image') {
+        stage('Build api_mensagem') {
             steps {
-                sh 'docker build -t mensagens .'
+                sh 'docker build -t api_mensagem ./api_mensagem'
             }
         }
    }
