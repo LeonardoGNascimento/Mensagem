@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
 export const ContainerChat = styled.div`
-  height: 100vh;
-  width: 100vw;
+  background-image: url("/src/assets/background.jpg");
+`;
+
+export const ContainerText = styled.div`
+  display: block;
+  bottom: 0px;
 `;

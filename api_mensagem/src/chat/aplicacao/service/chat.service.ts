@@ -18,7 +18,7 @@ export class ChatService {
     const chats = await this.chatRepository.listar();
 
     if (!chats) {
-      throw new NotFoundException('E-mail já cadastrado');
+      throw new NotFoundException('Nenhum chat encontrado');
     }
 
     return chats;

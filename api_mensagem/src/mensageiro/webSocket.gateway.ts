@@ -1,11 +1,5 @@
 import { Logger, UseGuards } from '@nestjs/common';
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { log } from 'console';
 import { Server } from 'socket.io';
 import { ChatService } from 'src/chat/aplicacao/service/chat.service';
@@ -25,10 +19,8 @@ export class WebsocketsGateway {
 
   @UseGuards(Ws2AuthGuard)
   @SubscribeMessage('criar_chat')
-  async handleCriarChat(
-    @ConnectedSocket() client: any,
-    @MessageBody() chat: any,
-  ) {
+  async handleCriarChat(@ConnectedSocket() client: any, @MessageBody() chat: any) {
+    log(chat);
     const chatExiste = await this.chatService.buscarPorCodigo(chat.chat);
 
     if (!chatExiste) {
@@ -37,32 +29,28 @@ export class WebsocketsGateway {
       });
     }
 
-    const mensagens = chatExiste
-      ? await this.mensagemService.buscarPorChat(chatExiste.id)
-      : [];
+    const mensagens = chatExiste ? await this.mensagemService.buscarPorChat(chatExiste.id) : [];
 
     client.join(chat.chat);
-
     client.emit('historico', mensagens);
   }
 
   @UseGuards(Ws2AuthGuard)
-  @SubscribeMessage('recebido')
-  async handleRecebido(
-    @ConnectedSocket() client: any,
-    @MessageBody() chat: any,
-  ) {
-    const user = client.handshake.headers.user;
+  @SubscribeMessage('enviar')
+  async handleEnviar(@ConnectedSocket() client: any, @MessageBody() chat: any) {
+    if (chat.arquivo) {
+      chat.mensagem = chat.mensagem[0];
+    }
+
+    const usuario = client.handshake.headers.user;
     const chatExiste = await this.chatService.buscarPorCodigo(chat.chat);
 
-    this.mensagemService.cadastrar({
-      chatId: chatExiste.id,
-      mensagem: chat.mensagem,
-      usuarioId: user.id,
-    });
+    // this.mensagemService.cadastrar({
+    //   chatId: chatExiste.id,
+    //   mensagem: chat.mensagem,
+    //   usuarioId: usuario.id,
+    // });
 
-    this.server
-      .to(chat.chat)
-      .emit('recebido', { ...chat, usuario: { nome: user.nome } });
+    this.server.to(chat.chat).emit('recebido', { ...chat, usuario });
   }
 }

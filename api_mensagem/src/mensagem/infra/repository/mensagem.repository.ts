@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { log } from 'console';
 import { format } from 'date-fns';
 import { CriarMensagemCommand } from 'src/mensagem/dominio/command/criarMensagem.command';
 import { Mensagem } from 'src/mensagem/dominio/entity/mensagem.entity';
@@ -49,7 +50,7 @@ export class MensagemRepository {
       return await queryBuild
         .leftJoinAndSelect('mensagem.usuario', 'usuario')
         .where('mensagem.chat.id = :chatId', { chatId })
-        .andWhere('mensagem.dataHora > :dataAtual', { dataAtual })
+        .andWhere('mensagem.dataHora < :dataAtual', { dataAtual })
         .getMany();
     } catch (e) {
       return [];
@@ -65,7 +66,7 @@ export class MensagemRepository {
       return await queryBuild
         .leftJoinAndSelect('mensagem.usuario', 'usuario')
         .where('mensagem.chat.id = :chatId', { chatId })
-        .andWhere('mensagem.dataHora <= :dataAtual', { dataAtual })
+        .andWhere('mensagem.dataHora >= :dataAtual', { dataAtual })
         .getMany();
     } catch (e) {
       return [];

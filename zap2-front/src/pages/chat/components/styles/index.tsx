@@ -3,15 +3,17 @@ import styled from "styled-components";
 const DivMensagens = styled.div`
   color: white;
   align-items: center;
-  background-image: url("/src/assets/background.jpg");
+
   z-index: 2;
   object-fit: cover;
   object-position: bottom;
   position: relative;
   background-repeat: no-repeat, no-repeat;
+  height: 52.1rem;
   max-height: 52.1rem;
   overflow-y: scroll;
   background-size: cover;
+  padding: 0 15rem;
 `;
 const Mensagem = styled.div<{ $backgroundColor?: string }>`
   background-color: ${(props) => props.$backgroundColor};
@@ -19,7 +21,7 @@ const Mensagem = styled.div<{ $backgroundColor?: string }>`
   margin-bottom: 30px;
   border-radius: 10px;
   padding: 10px;
-  width: 50%;
+  width: auto;
 `;
 
 export { DivMensagens, Mensagem };

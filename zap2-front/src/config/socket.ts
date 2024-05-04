@@ -5,7 +5,7 @@ const socket = io("http://192.168.0.17:3000/", {
     polling: {
       extraHeaders: {
         Authorization:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tZSI6ImxlbyIsImlhdCI6MTY5OTA5Njc0NSwiZXhwIjoxNzA0MjgwNzQ1fQ.R-fzusy3vVghZwjrDtCXHwRXgowr7FEkl5SPGq2KwKE",
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywibm9tZSI6IkxlbzIiLCJpYXQiOjE3MTQ1OTM5OTEsImV4cCI6MTcxOTc3Nzk5MX0.l4FKHe9EZKVyltazZ_HNqjTzL0G710DZy_mnqgU9JB0",
       },
     },
   },

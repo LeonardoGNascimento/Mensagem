@@ -1,114 +1,44 @@
-import { Col, Row, Button } from "react-bootstrap";
-import { TextField } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Toaster } from "react-hot-toast";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { AxiosRequest } from "../../core/request/axios";
+import { useRequest } from "../../core/request/useRequest";
+import { ILogin } from "./interface/ILogin";
+import { loginSchema } from "./validator/validator";
+import { Button } from "@/components/ui/button";
 
 export function Login() {
-  const [codigo, setCodigo] = useState<string>("");
-  const [nome, setNome] = useState<string>("");
-  const [nomeErro, setNomeErro] = useState(false);
-  const [chatErro, setChatErro] = useState(false);
+  const { post } = useRequest(new AxiosRequest(), "http://localhost:3000");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const queryString = window.location.search;
-    const searchParams = new URLSearchParams(queryString);
-    const paramValue = searchParams.get("codigo");
-    const nomeSalvo = localStorage.getItem("nome");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILogin>({
+    resolver: yupResolver(loginSchema),
+  });
 
-    if (nomeSalvo) {
-      setNome(nomeSalvo);
-    }
+  async function login(login: ILogin) {
+    const { data, hasErro } = await post("/usuario/login", login);
 
-    if (paramValue) {
-      setCodigo(paramValue);
-    }
-  }, []);
-
-  function login() {
-    if (!nome) {
-      setNomeErro(true);
+    if (hasErro) {
       return;
     }
 
-    if (!codigo) {
-      setChatErro(true);
-      return;
-    }
-
-    localStorage.setItem("nome", nome);
-    window.location.href = `?chat=${codigo}`;
-  }
-
-  function geraStringAleatoria(tamanho: number) {
-    var stringAleatoria = "";
-    var caracteres =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < tamanho; i++) {
-      stringAleatoria += caracteres.charAt(
-        Math.floor(Math.random() * caracteres.length)
-      );
-    }
-    setCodigo(stringAleatoria);
+    localStorage.setItem("token", data.access_token);
+    navigate("/teste");
   }
 
   return (
-    <>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=""
-        containerStyle={{}}
-        toastOptions={{
-          // Define default options
-          className: "",
-          duration: 5000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-        }}
-      />
-      <div className="d-flex justify-content-center mb-5 mt-5">
-        <div>
-          <Row className="mb-3">
-            <Col>
-              <TextField
-                id="nome"
-                label="Nome"
-                variant="outlined"
-                error={nomeErro}
-                value={nome}
-                onChange={(e) => {
-                  setNome(e.target.value);
-                  setNomeErro(false);
-                }}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <TextField
-                id="outlined-basic"
-                label="Código sala"
-                variant="outlined"
-                error={chatErro}
-                value={codigo}
-                onChange={(e) => {
-                  setCodigo(e.target.value);
-                  setChatErro(false);
-                }}
-              />
-            </Col>
-          </Row>
+    <div className="flex justify-center mb-5 mt-5">
+      <form onSubmit={handleSubmit(login)}>
+        <input id="email" {...register("email")} />
+        <input id="senha" type="password" {...register("senha")} />
+        <div className="flex justify-center mt-2">
+          <Button type="submit">Entrar</Button>
         </div>
-      </div>
-      <div className="d-flex justify-content-center">
-        <Button className="me-1" onClick={() => geraStringAleatoria(20)}>
-          Gerar Link
-        </Button>
-        <Button onClick={login}>Entrar</Button>
-      </div>
-    </>
+      </form>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { log } from 'console';
 import { CriarMensagemCommand } from 'src/mensagem/dominio/command/criarMensagem.command';
+import { Mensagem } from 'src/mensagem/dominio/entity/mensagem.entity';
 import { MensagemRepository } from 'src/mensagem/infra/repository/mensagem.repository';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class MensagemService {
     return await this.mensagemRepository.cadastrar(criarMensagemCommand);
   }
 
-  async buscarPorChat(chatId: number) {
+  async buscarPorChat(chatId: number): Promise<Mensagem[]> {
     let mensagensCache: any[] = await this.cacheManager.get(`${chatId}`);
 
     if (!mensagensCache) {
